@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>RigLingo</title>
 <meta name="description" content="Live two-way voice translation for your ham radio. Runs on-device in desktop Chrome or Edge.">
-<meta name="theme-color" content="#0b1026">
+<meta name="theme-color" content="#eef2f5" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1b2126" media="(prefers-color-scheme: dark)">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -14,18 +15,18 @@
 <body>
 
 <header class="topbar">
-  <img class="logo" src="icons/icon-192.png" alt="" width="40" height="40">
+  <img class="logo" src="icons/icon-192.png" alt="" width="44" height="44">
   <div class="brand">
     <h1>RigLingo</h1>
-    <div class="tagline">Live voice translation for your rig &middot; v<span id="appVersion">1.0.0</span></div>
+    <div class="tagline">Live voice translation for your radio <span class="ver">v<span id="appVersion">1.1.0</span></span></div>
   </div>
-  <div class="lamps">
-    <span class="lamp" id="lampRig" title="Radio CAT/PTT connection">RIG</span>
-    <span class="lamp" id="lampAI" title="Speech models">AI</span>
-    <span class="lamp" id="lampRX" title="Listening to the radio">RX</span>
-    <span class="lamp lamp-tx" id="lampTX" title="Transmitting">TX</span>
+  <div class="status" aria-live="polite">
+    <span class="chip" id="lampRig">Radio not connected</span>
+    <span class="chip" id="lampAI">Models not loaded</span>
+    <span class="chip" id="lampRX">Not listening</span>
+    <span class="chip chip-tx" id="lampTX" hidden>On air</span>
   </div>
-  <div class="vfo" id="vfo"><span id="vfoFreq">--.---.---</span> <span id="vfoMode">---</span></div>
+  <div class="vfo" id="vfo" title="Frequency and mode read from the radio"><span id="vfoFreq">No frequency</span> <span id="vfoMode"></span></div>
 </header>
 
 <div class="banner" id="banner" hidden></div>
@@ -36,7 +37,7 @@
   <aside class="setup">
 
     <details class="card" id="cardCheck" open>
-      <summary><span class="num">0</span> Browser check</summary>
+      <summary>Browser check</summary>
       <ul class="checks" id="checks"></ul>
       <p class="hint">Needs desktop Chrome or Edge. Web Serial, audio routing and the on-device translator are not available on iPad or phones.</p>
     </details>
@@ -73,7 +74,7 @@
       </div>
       <div class="btnrow">
         <button id="btnTestPTT" class="btn warn">Test key (1.5 s)</button>
-        <button id="btnUnkey" class="btn danger">UNKEY NOW</button>
+        <button id="btnUnkey" class="btn danger">Unkey now</button>
       </div>
       <p class="hint" id="rigStatus">Not connected.</p>
     </details>
@@ -198,7 +199,7 @@
 
     <div class="txpanel">
       <button id="btnTalk" class="talk" disabled>
-        <span class="talkmain">HOLD TO TALK</span>
+        <span class="talkmain">Hold to talk</span>
         <span class="talksub" id="talkSub">space bar works too</span>
       </button>
       <div class="typebox">
@@ -211,7 +212,7 @@
 </main>
 
 <footer class="foot">
-  RigLingo &middot; ARTEZIQ &middot; speech and translation run on this computer &middot; models download once and are cached
+  An ARTEZIQ app by ARTEZIQ and Kathryn Mullan. Speech recognition and translation run on this computer; models download once and stay cached.
 </footer>
 
 <script src="app.js"></script>

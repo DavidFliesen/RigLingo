@@ -1,11 +1,17 @@
-# RigLingo v1.0.0
+# RigLingo v1.1.0
 
-**Running app*
-- **GITHUB (public):** https://davidfliesen.github.io/riglingo/
+> **Live two-way voice translation for ham radio.** Hear other stations in your language and reply in theirs. Speech recognition, translation and neural voices all run on your own computer, and RigLingo keys your rig by CAT, RTS, DTR or VOX. Built for the Yaesu FT-991A. A desktop Chrome/Edge PWA with no API keys.
 
-Live two-way voice translation for ham radio. RigLingo listens to your radio, transcribes and translates the other station into your language, and speaks it to your headset. When you reply, it transcribes you, translates into their language, keys the radio and sends the translated speech over the air. Built and tested around the **Yaesu FT-991A** over a single USB cable.
+**Running app:** https://davidfliesen.github.io/RigLingo/
+
+**Design conversation:** [How RigLingo was planned and built](SHARE_LINK_HERE)
+
+---
+
+Live two-way voice translation for ham radio. RigLingo listens to your radio, transcribes and translates the other station into your language, and speaks it to your headset. When you reply, it transcribes you, translates into their language, keys the radio and sends the translated speech over the air. Built around the **Yaesu FT-991A** over a single USB cable.
 
 An ARTEZIQ app by ARTEZIQ and Kathryn Mullan.
+
 ---
 
 ## How it works
@@ -45,14 +51,17 @@ Set the USB transmit level low to start, then raise RigLingo's **TX audio level*
 
 ## Using it
 
+The header always shows plain-language status: radio connection, models, listening, and a red **On air** label whenever RigLingo is transmitting. The app follows your system's light or dark setting.
+
+
 1. **Connect radio** – choose the *Enhanced* COM port for CAT keying, or the *Standard* port for RTS/DTR keying. Click **Test key** with a dummy load or clear frequency to confirm.
 2. **Allow audio** – RigLingo picks the *USB Audio CODEC* for radio in and out automatically. Choose your mic and headset.
 3. **Languages** – pick the other station's language (or Auto-detect) and yours, then **Download & prepare** (first time per language pair).
 4. **Station** – enter your callsign. RigLingo gives an **English station ID** automatically when 10 minutes have passed (or every transmission, or manually).
-5. **Start listening.** Adjust **Voice trigger** so the red mark sits just above the noise bar.
+5. **Start listening.** Adjust **Voice trigger** so the dark marker sits just above the noise level on the meter.
 6. Hold **Talk** (or the space bar) and speak. Release, check the translation, press **Transmit**. Or type a message and press **Translate**.
 
-**Esc** or **UNKEY NOW** stops any transmission instantly. A TX timeout (default 90 s) is a backstop.
+**Esc** or **Unkey now** stops any transmission instantly. A TX timeout (default 90 s) is a backstop.
 
 ## Languages
 
@@ -90,10 +99,12 @@ app.js                 App logic (ES5)
 worker.js              Speech engine worker (Whisper + MMS voices; one ES-module import line)
 sw.js                  Offline service worker
 manifest.webmanifest   PWA manifest
-icons/                 Pixel-art app icons
+icons/                 App icons (192, 512, maskable, Apple touch, favicon)
 README.md              This file
 ```
 
 ## Changelog
+
+**v1.1.0** – Redesigned for comfort and readability: calm light theme with a soft dark mode for night operating, larger text, conversation-style log (heard on the left, you on the right), plain-language status labels, a quieter unsupported-device notice, and a new app icon. Credits updated.
 
 **v1.0.0** – First release: receive and transmit translation pipelines, CAT/RTS/DTR/VOX keying with frequency/mode readout, 16 languages with auto-detect, review-before-transmit, English auto-ID with phonetics, TX timeout and instant unkey, offline PWA.

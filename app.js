@@ -1,6 +1,6 @@
 /*
- * RigLingo v1.0.0 - live two-way voice translation for ham radio
- * ARTEZIQ / Cibola Studios
+ * RigLingo v1.1.0 - live two-way voice translation for ham radio
+ * An ARTEZIQ app by ARTEZIQ and Kathryn Mullan
  *
  * ES5 only (no let/const, arrow functions, template literals or classes).
  * Heavy speech models run in worker.js.
@@ -26,7 +26,7 @@
   /* =========================================================
    * 1. Constants & languages
    * ========================================================= */
-  var VERSION = '1.0.0';
+  var VERSION = '1.1.0';
   var SAMPLE_RATE = 16000;
   var FRAME = 2048;                       // samples per audio frame (128 ms)
   var FRAME_SEC = FRAME / SAMPLE_RATE;
@@ -150,9 +150,19 @@
     return p(d.getUTCHours()) + ':' + p(d.getUTCMinutes()) + ':' + p(d.getUTCSeconds()) + 'Z';
   }
 
+  var LAMP_TEXT = {
+    lampRig: { '': 'Radio not connected', on: 'Radio connected', err: 'Radio problem' },
+    lampAI: { '': 'Models not loaded', busy: 'Loading models…', on: 'Models ready', err: 'Model problem' },
+    lampRX: { '': 'Not listening', on: 'Listening', busy: 'Hearing a signal' },
+    lampTX: { '': 'On air', on: 'On air' }
+  };
+
   function setLamp(id, state) {
     var n = $(id);
-    n.className = 'lamp' + (id === 'lampTX' ? ' lamp-tx' : '') + (state ? ' ' + state : '');
+    state = state || '';
+    n.className = 'chip' + (id === 'lampTX' ? ' chip-tx' : '') + (state ? ' ' + state : '');
+    if (LAMP_TEXT[id] && LAMP_TEXT[id][state]) { n.textContent = LAMP_TEXT[id][state]; }
+    if (id === 'lampTX') { n.hidden = state !== 'on'; }
   }
 
   var bannerTimer = null;
@@ -172,8 +182,8 @@
     var empty = $('logEmpty');
     if (empty) { empty.parentNode.removeChild(empty); }
     var box = el('div', 'entry ' + kind + (opts.working ? ' working' : ''));
-    var meta = el('div', 'meta', timeStamp() + (rig.freqText ? '  ' + rig.freqText : '') + '  ' +
-      (kind === 'rx' ? 'RX' : kind === 'tx' ? 'TX' : kind === 'err' ? 'ERROR' : 'INFO'));
+    var who = kind === 'rx' ? 'Heard' : kind === 'tx' ? 'You' : '';
+    var meta = el('div', 'meta', who + ', ' + timeStamp() + (rig.freqText ? ', ' + rig.freqText + ' MHz' : ''));
     var badge = el('span', 'badge', opts.badge || '');
     if (!opts.badge) { badge.style.display = 'none'; }
     meta.appendChild(badge);
@@ -764,6 +774,7 @@
     function pad(n) { return n < 10 ? '00' + n : n < 100 ? '0' + n : '' + n; }
     rig.freqText = mhz + '.' + pad(khz) + '.' + pad(h);
     $('vfoFreq').textContent = rig.freqText;
+    $('vfo').className = 'vfo';
   }
 
   function startPolling() {
@@ -1186,7 +1197,7 @@
       return render;
     }).then(function () {
       if (txAbort) { throw new Error('Cancelled'); }
-      $('talkSub').textContent = 'TRANSMITTING – Esc to stop';
+      $('talkSub').textContent = 'On air. Press Esc to stop.';
       return setPTT(true);
     }).then(function () {
       timeout = setTimeout(function () {
@@ -1526,11 +1537,12 @@
   }
 
   loadSettings();
+  $('vfo').className = 'vfo idle';
   runChecks();
   wire();
   startWorker();
   registerSW();
   if (!caps.translator) {
-    banner('This browser has no on-device translator. Use Chrome 138 or newer on Windows, macOS or Linux.', null);
+    banner('Translation and radio control need Chrome or Edge on a Windows, Mac or Linux computer. On this device you can look around, but RigLingo can’t operate the radio.', null);
   }
 })();
