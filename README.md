@@ -10,8 +10,6 @@
 
 Live two-way voice translation for ham radio. RigLingo listens to your radio, transcribes and translates the other station into your language, and speaks it to your headset. When you reply, it transcribes you, translates into their language, keys the radio and sends the translated speech over the air. Built around the **Yaesu FT-991A** over a single USB cable.
 
-Created by Kathryn Mullan.
-
 ---
 
 ## How it works
