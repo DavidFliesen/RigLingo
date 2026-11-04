@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RigLingo</title>
+<meta name="description" content="Live two-way voice translation for your ham radio. Runs on-device in desktop Chrome or Edge.">
+<meta name="theme-color" content="#0b1026">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <img class="logo" src="icons/icon-192.png" alt="" width="40" height="40">
+  <div class="brand">
+    <h1>RigLingo</h1>
+    <div class="tagline">Live voice translation for your rig &middot; v<span id="appVersion">1.0.0</span></div>
+  </div>
+  <div class="lamps">
+    <span class="lamp" id="lampRig" title="Radio CAT/PTT connection">RIG</span>
+    <span class="lamp" id="lampAI" title="Speech models">AI</span>
+    <span class="lamp" id="lampRX" title="Listening to the radio">RX</span>
+    <span class="lamp lamp-tx" id="lampTX" title="Transmitting">TX</span>
+  </div>
+  <div class="vfo" id="vfo"><span id="vfoFreq">--.---.---</span> <span id="vfoMode">---</span></div>
+</header>
+
+<div class="banner" id="banner" hidden></div>
+
+<main class="layout">
+
+  <!-- ============ SETUP COLUMN ============ -->
+  <aside class="setup">
+
+    <details class="card" id="cardCheck" open>
+      <summary><span class="num">0</span> Browser check</summary>
+      <ul class="checks" id="checks"></ul>
+      <p class="hint">Needs desktop Chrome or Edge. Web Serial, audio routing and the on-device translator are not available on iPad or phones.</p>
+    </details>
+
+    <details class="card" id="cardRig" open>
+      <summary><span class="num">1</span> Radio (CAT / PTT)</summary>
+      <label>PTT method
+        <select id="pttMethod">
+          <option value="cat">CAT command (TX1; / TX0;) &ndash; Enhanced COM port</option>
+          <option value="rts">RTS line &ndash; Standard COM port</option>
+          <option value="dtr">DTR line &ndash; Standard COM port</option>
+          <option value="vox">VOX (no serial connection)</option>
+        </select>
+      </label>
+      <div class="row2">
+        <label>Baud (CAT RATE)
+          <select id="baud">
+            <option>4800</option><option>9600</option><option>19200</option><option>38400</option>
+          </select>
+        </label>
+        <label>Stop bits
+          <select id="stopBits"><option value="2">2</option><option value="1">1</option></select>
+        </label>
+      </div>
+      <div class="row2">
+        <label>Flow control
+          <select id="flow"><option value="none">None</option><option value="hardware">Hardware (RTS/CTS)</option></select>
+        </label>
+        <label class="check"><input type="checkbox" id="onlyYaesu" checked> Only show CP210x ports</label>
+      </div>
+      <div class="btnrow">
+        <button id="btnConnect" class="btn primary">Connect radio</button>
+        <button id="btnDisconnect" class="btn" disabled>Disconnect</button>
+      </div>
+      <div class="btnrow">
+        <button id="btnTestPTT" class="btn warn">Test key (1.5 s)</button>
+        <button id="btnUnkey" class="btn danger">UNKEY NOW</button>
+      </div>
+      <p class="hint" id="rigStatus">Not connected.</p>
+    </details>
+
+    <details class="card" id="cardAudio" open>
+      <summary><span class="num">2</span> Audio routing</summary>
+      <button id="btnAllowAudio" class="btn primary wide">Allow audio &amp; list devices</button>
+      <label>Radio receive audio (in)
+        <select id="devRadioIn"></select>
+      </label>
+      <label>Radio transmit audio (out)
+        <select id="devRadioOut"></select>
+      </label>
+      <label>My microphone
+        <select id="devMicIn"></select>
+      </label>
+      <label>My speakers / headset
+        <select id="devLocalOut"></select>
+      </label>
+      <p class="hint">On the FT-991A both radio entries are &ldquo;USB Audio CODEC&rdquo;. Use a headset so translated audio doesn&rsquo;t leak into your mic.</p>
+
+      <div class="meterwrap">
+        <div class="meterlabel">RX level <span id="rxDb">-- dB</span></div>
+        <div class="meter"><div class="meterfill" id="rxMeter"></div><div class="metermark" id="rxMark"></div></div>
+      </div>
+      <label>Voice trigger: <b id="sensVal">8</b> dB above noise
+        <input type="range" id="sens" min="3" max="25" step="1" value="8">
+      </label>
+      <label>End of over after: <b id="hangVal">1.2</b> s of quiet
+        <input type="range" id="hang" min="0.6" max="4" step="0.1" value="1.2">
+      </label>
+      <label>TX audio level: <b id="txGainVal">60</b>%
+        <input type="range" id="txGain" min="5" max="100" step="1" value="60">
+      </label>
+      <p class="hint">Start the TX level low and watch the radio&rsquo;s ALC meter.</p>
+    </details>
+
+    <details class="card" id="cardLang" open>
+      <summary><span class="num">3</span> Languages &amp; models</summary>
+      <label>Other station speaks
+        <select id="theirLang"></select>
+      </label>
+      <label>I speak
+        <select id="myLang"></select>
+      </label>
+      <label>Speech recognition model
+        <select id="asrModel">
+          <option value="onnx-community/whisper-tiny">Whisper Tiny &ndash; fastest (~40 MB)</option>
+          <option value="onnx-community/whisper-base" selected>Whisper Base &ndash; balanced (~80 MB)</option>
+          <option value="onnx-community/whisper-small">Whisper Small &ndash; best on weak signals (~250 MB)</option>
+        </select>
+      </label>
+      <button id="btnPrepare" class="btn primary wide">Download &amp; prepare</button>
+      <div class="progress" id="prepProgress" hidden><div class="progressfill" id="prepFill"></div></div>
+      <ul class="checks" id="prepStatus"></ul>
+      <div class="btnrow">
+        <button id="btnTestVoice" class="btn">Test their voice</button>
+        <button id="btnTestMyVoice" class="btn">Test my voice</button>
+      </div>
+    </details>
+
+    <details class="card" id="cardStation">
+      <summary><span class="num">4</span> Station &amp; safety</summary>
+      <label>My callsign
+        <input type="text" id="callsign" placeholder="e.g. K4ABC" autocomplete="off" spellcheck="false">
+      </label>
+      <label>English station ID
+        <select id="idMode">
+          <option value="10min">Auto, when 10 minutes are up</option>
+          <option value="every">Every transmission</option>
+          <option value="manual">Manual only (ID button)</option>
+        </select>
+      </label>
+      <label class="check"><input type="checkbox" id="reviewTx" checked> Let me review the translation before it transmits</label>
+      <label class="check"><input type="checkbox" id="speakRx" checked> Speak translated receive audio</label>
+      <label class="check"><input type="checkbox" id="showOriginal" checked> Show original-language text in the log</label>
+      <div class="row2">
+        <label>Lead-in (ms)
+          <input type="number" id="leadIn" min="0" max="1500" step="50" value="300">
+        </label>
+        <label>TX timeout (s)
+          <input type="number" id="txTimeout" min="10" max="300" step="5" value="90">
+        </label>
+      </div>
+      <p class="hint">You remain the control operator for everything RigLingo transmits.</p>
+    </details>
+
+  </aside>
+
+  <!-- ============ CONSOLE COLUMN ============ -->
+  <section class="console">
+
+    <div class="ctrlbar">
+      <button id="btnListen" class="btn primary">Start listening</button>
+      <button id="btnID" class="btn">Send ID</button>
+      <button id="btnClear" class="btn ghost">Clear log</button>
+      <span class="idtimer" id="idTimer">ID: not yet sent</span>
+    </div>
+
+    <div class="log" id="log" aria-live="polite">
+      <div class="empty" id="logEmpty">
+        <p><b>Quick start</b></p>
+        <ol>
+          <li>Connect the FT-991A by USB and click <b>Connect radio</b>.</li>
+          <li>Click <b>Allow audio</b>, then pick the USB Audio CODEC for radio in and out.</li>
+          <li>Pick the languages and click <b>Download &amp; prepare</b> (first time only).</li>
+          <li>Click <b>Start listening</b>. Hold <b>Talk</b> (or the space bar) to reply.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="review" id="review" hidden>
+      <div class="reviewhead">Ready to transmit &rarr; <span id="reviewLang"></span></div>
+      <div class="reviewsrc" id="reviewSrc"></div>
+      <textarea id="reviewText" rows="3"></textarea>
+      <div class="btnrow">
+        <button id="btnTransmit" class="btn danger">Transmit</button>
+        <button id="btnRetranslate" class="btn">Re-translate my text</button>
+        <button id="btnDiscard" class="btn ghost">Discard</button>
+      </div>
+    </div>
+
+    <div class="txpanel">
+      <button id="btnTalk" class="talk" disabled>
+        <span class="talkmain">HOLD TO TALK</span>
+        <span class="talksub" id="talkSub">space bar works too</span>
+      </button>
+      <div class="typebox">
+        <textarea id="typeText" rows="2" placeholder="&hellip;or type a message in your language"></textarea>
+        <button id="btnTypeSend" class="btn primary">Translate</button>
+      </div>
+    </div>
+
+  </section>
+</main>
+
+<footer class="foot">
+  RigLingo &middot; ARTEZIQ &middot; speech and translation run on this computer &middot; models download once and are cached
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
