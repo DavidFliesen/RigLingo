@@ -1,7 +1,6 @@
 # RigLingo v1.0.0
 
-**Running app**
-- **CLOUDFLARE (testers):** https://riglingo.pages.dev/
+**Running app*
 - **GITHUB (public):** https://davidfliesen.github.io/riglingo/
 
 Live two-way voice translation for ham radio. RigLingo listens to your radio, transcribes and translates the other station into your language, and speaks it to your headset. When you reply, it transcribes you, translates into their language, keys the radio and sends the translated speech over the air. Built and tested around the **Yaesu FT-991A** over a single USB cable.
