@@ -1,8 +1,8 @@
-/* RigLingo service worker v1.1.0 (ES5)
+/* RigLingo service worker v1.1.1 (ES5)
  * App shell: cache-first. Speech engine and its runtime from jsDelivr:
  * cached on first use so RigLingo keeps working offline afterwards.
  * Model weights are cached separately by Transformers.js itself. */
-var VERSION = '1.1.0';
+var VERSION = '1.1.1';
 var SHELL_CACHE = 'riglingo-shell-' + VERSION;
 var RUNTIME_CACHE = 'riglingo-runtime-v1';
 var SHELL = [

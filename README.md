@@ -1,4 +1,4 @@
-# RigLingo v1.1.0
+# RigLingo v1.1.1
 
 > **Live two-way voice translation for ham radio.** Hear other stations in your language and reply in theirs. Speech recognition, translation and neural voices all run on your own computer, and RigLingo keys your rig by CAT, RTS, DTR or VOX. Built for the Yaesu FT-991A. A desktop Chrome/Edge PWA with no API keys.
 
@@ -10,7 +10,7 @@
 
 Live two-way voice translation for ham radio. RigLingo listens to your radio, transcribes and translates the other station into your language, and speaks it to your headset. When you reply, it transcribes you, translates into their language, keys the radio and sends the translated speech over the air. Built around the **Yaesu FT-991A** over a single USB cable.
 
-An ARTEZIQ app by ARTEZIQ and Kathryn Mullan.
+Created by Kathryn Mullan.
 
 ---
 
@@ -105,6 +105,8 @@ README.md              This file
 
 ## Changelog
 
-**v1.1.0** – Redesigned for comfort and readability: calm light theme with a soft dark mode for night operating, larger text, conversation-style log (heard on the left, you on the right), plain-language status labels, a quieter unsupported-device notice, and a new app icon. Credits updated.
+**v1.1.1** – Credits updated to Kathryn Mullan.
+
+**v1.1.0** – Redesigned for comfort and readability: calm light theme with a soft dark mode for night operating, larger text, conversation-style log (heard on the left, you on the right), plain-language status labels, a quieter unsupported-device notice, and a new app icon.
 
 **v1.0.0** – First release: receive and transmit translation pipelines, CAT/RTS/DTR/VOX keying with frequency/mode readout, 16 languages with auto-detect, review-before-transmit, English auto-ID with phonetics, TX timeout and instant unkey, offline PWA.

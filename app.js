@@ -1,6 +1,6 @@
 /*
- * RigLingo v1.1.0 - live two-way voice translation for ham radio
- * An ARTEZIQ app by ARTEZIQ and Kathryn Mullan
+ * RigLingo v1.1.1 - live two-way voice translation for ham radio
+ * By Kathryn Mullan
  *
  * ES5 only (no let/const, arrow functions, template literals or classes).
  * Heavy speech models run in worker.js.
@@ -26,7 +26,7 @@
   /* =========================================================
    * 1. Constants & languages
    * ========================================================= */
-  var VERSION = '1.1.0';
+  var VERSION = '1.1.1';
   var SAMPLE_RATE = 16000;
   var FRAME = 2048;                       // samples per audio frame (128 ms)
   var FRAME_SEC = FRAME / SAMPLE_RATE;
